@@ -1,0 +1,16 @@
+# Environment files
+.env
+
+# Virtual environment
+nasaenv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build / distribution
+build/
+dist/
+*.egg-info/
