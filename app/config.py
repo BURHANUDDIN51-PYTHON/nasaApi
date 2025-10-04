@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str
     PINECONE_API_KEY: str
     GEMINI_API_KEY: str
+    
     # This tells pydantic-settings to load variables from a .env file.
     model_config = SettingsConfigDict(env_file=".env")
 

@@ -1,7 +1,7 @@
 import google.generativeai as genai
 import os
 from app.config import settings
-from rag_service import RAGService
+from app.services.rag_service import RAGService
 
 class ChatbotService:
     """

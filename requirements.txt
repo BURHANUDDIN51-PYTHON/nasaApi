@@ -6,6 +6,6 @@ pydantic-settings
 google-generativeai
 sentence-transformers
 pandas
-pinecone-client
+pinecone
 tqdm
 requests

@@ -3,7 +3,7 @@ import json
 from groq import Groq
 from app.config import settings
 from typing import Dict, Any
-from rag_service import RAGService
+from app.services.rag_service import RAGService
 
 class SummarizeService:
     """
