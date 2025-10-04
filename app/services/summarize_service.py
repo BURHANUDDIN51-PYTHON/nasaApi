@@ -3,6 +3,7 @@ import json
 from groq import Groq
 from app.config import settings
 from typing import Dict, Any
+from rag_service import RAGService
 
 class SummarizeService:
     """
@@ -52,6 +53,7 @@ AI Response:
         self.model = "llama-3.3-70b-versatile"
         self.fast_model = "llama-3.1-8b-instant" # A faster model for simple classification
         print("SummarizeService initialized.")
+        self.ragServe = RAGService()
         # self.warmup()
 
     def warmup(self):
@@ -197,9 +199,55 @@ AI Response:
         """
         Generates a long-form summary and conditionally adds visualization data.
         """
-        user_prompt = f"Please perform a detailed analysis on the following topic: '{query}'"
+        
         
         try:
+            
+            print(f"Retrieving context for query: '{query}'...")
+            retrieved_texts, source_papers = self.ragServe.query(query, top_k=100)
+            
+            
+            if not retrieved_texts:
+                print("No relevant context found by RAG service.")
+                no_context_message = f"# No Information Found\n\nSorry, we could not find any relevant information for the topic: '{query}'. Please try a different query."
+                return {"summary": no_context_message, "visualization_data": {}, "sources": []}
+
+            # Combine the retrieved text chunks into a single context string
+            context_str = "\n\n---\n\n".join(retrieved_texts)
+            sources_formatted = ""
+            for i, paper in enumerate(source_papers):
+                sources_formatted += f"[{i+1}] Title: {paper.get('title', 'N/A')}, Authors: {paper.get('authors', 'N/A')}\n"
+
+            user_prompt = f"""
+                You are a specialized research assistant. Your task is to answer the user's query based ONLY on the provided context and sources.
+
+                **Instructions:**
+                1.  Synthesize the information from the **CONTEXT TO USE** to provide a detailed and comprehensive answer to the **USER'S QUERY**.
+                2.  When you use information from the context, you MUST cite it. Use bracketed numbers like `[1]`, `[2]`, etc., which correspond to the **AVAILABLE SOURCES** list.
+                3.  At the end of your entire response, list all the sources you used under a "References" heading.
+
+                ---
+
+                **USER'S QUERY:**
+                {query}
+
+                ---
+
+                **AVAILABLE SOURCES:**
+                {sources_formatted}
+
+                ---
+
+                **CONTEXT TO USE:**
+                {context_str}
+
+                ---
+
+                **Answer:**
+            """
+            
+            
+            
             # 1. Generate the main summary as a JSON object
             chat_completion = self.client.chat.completions.create(
                 messages=[

@@ -4,3 +4,8 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 google-generativeai
+sentence-transformers
+pandas
+pinecone-client
+tqdm
+requests
